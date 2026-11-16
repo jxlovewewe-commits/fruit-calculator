@@ -41,6 +41,19 @@ td.p .lb{font-size:11px}
 td.cmp,td.cmp .df{font-size:11px}
 .profit-m{display:block!important}
 }
+.ilist{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.icard{border:1px solid #eee;border-radius:10px;padding:12px;background:#fafafa}
+.icard h3{margin:0 0 4px;font-size:16px}
+.icard.gift h3{color:#b0405a}
+.icard .meta{font-size:13px;color:#555;line-height:1.45;word-break:keep-all}
+.icard .pr{font-size:15px;margin-top:6px}
+.icard .quote{font-size:12px;color:#555;margin-top:4px;line-height:1.4}
+.icard .quote b{color:#1d5c30}
+.icard .row{margin-top:8px}
+#itm-form{margin-top:12px;padding-top:12px;border-top:1px solid #eee}
+#itm-form h3{font-size:14px;margin:0 0 8px}
+#itm-msg{display:block;margin-top:8px;font-size:13px;color:#2f6b3f}
+
 </style></head><body><div class="w">
 <h1>🥭 과일 세트 판매가 계산기</h1><p class="s">박스 매입가와 과수만 넣으면 세트별 판매가가 바로 나와요.<br><span id="upd" style="color:#2f6b3f"></span></p>
 <div class="card"><h2>1. 매입 정보</h2>
@@ -60,6 +73,35 @@ td.cmp,td.cmp .df{font-size:11px}
 <div class="btns"><button data-f="0">수수료 0%</button><button data-f="3.5">스마트스토어 약 3.5%</button><button data-f="4.63">최대 약 4.6%</button></div>
 <label style="margin-top:10px"><input id="rd" type="checkbox" checked style="width:auto"> 100원 단위 올림</label></div>
 <div class="card" id="mk" style="display:none"><h2>4. 온라인 시세 (자동 갱신)</h2><table><thead><tr><th>상품</th><th>판매처</th><th>가격</th></tr></thead><tbody id="mkb"></tbody></table><small id="mkn"></small></div>
+
+<div class="card" id="itm"><h2>5. 품목 등록</h2>
+<small>본부·대리점과 같은 품목 형식으로 등록해요. 기본 목록은 items.json에서 불러오고, 이 화면에서 바꾼 내용은 이 브라우저에만 저장돼요.</small>
+<div class="btns" style="margin-top:8px">
+<button type="button" id="itm-reset">기본 품목으로 되돌리기</button>
+<button type="button" id="itm-export">JSON 내보내기</button>
+<button type="button" id="itm-import">JSON 가져오기</button>
+<input id="itm-file" type="file" accept="application/json,.json" hidden>
+</div>
+<div id="itm-list" class="ilist"></div>
+<form id="itm-form">
+<h3 id="itm-form-title">품목 추가</h3>
+<div class="g">
+<label>상품명<input id="it-name" required placeholder="애플망고"></label>
+<label>나라<input id="it-country" required placeholder="페루"></label>
+<label>품종<input id="it-variety" required placeholder="켄트"></label>
+<label>유형<select id="it-type"><option value="실속">실속</option><option value="선물">선물</option></select></label>
+<label>키로수 (kg)<input id="it-kg" type="number" step="0.01" min="0" required></label>
+<label>과수<input id="it-count" type="number" inputmode="numeric" min="1" required></label>
+<label>매입가 (원, 과일 원가)<input id="it-cost" type="number" inputmode="numeric" min="0" required></label>
+<label>판매가 (원)<input id="it-price" type="number" inputmode="numeric" min="0" required></label>
+</div>
+<div class="btns">
+<button type="submit" id="itm-save">추가</button>
+<button type="button" id="itm-cancel">취소</button>
+</div>
+</form>
+<small id="itm-msg"></small>
+</div>
 <small>등락 표시는 자동 갱신된 시중 시세(같은 품목·과수·유형 기준)와 비교한 값이에요. 비교 칸의 판매처·가격을 누르면 해당 페이지로 이동해요.</small><br>
 <small>판매가 = (과일 원가 + 박스 + 택배 + 남길 돈) ÷ (1 − 수수료율)</small>
 </div><script>
@@ -77,11 +119,12 @@ const sets=[['실속 4과',4,v('bb')],['실속 6과',6,v('bb')],['실속 8과',8
 const sel=$('pre'),nm=sel.value?sel.options[sel.selectedIndex].text.replace(/\s*\(.*$/,''):'직접 입력';
 $('tb').innerHTML=sets.map(([l,n,b])=>{const fr=per*n;let s=(fr+b+ship+v('m'))/(1-f);if($('rd').checked)s=Math.ceil(s/100)*100;const fe=s*f,pr=s-fe-fr-b-ship;
 return `<tr class="${l.startsWith('선물')?'gift':''}"><td class="c-set"><b>${l}</b><span class="nm">${esc(nm)}</span><span class="profit-m">남는 돈 ${w(pr)}</span></td><td class="hide">${w(fr)}</td><td class="hide">${w(b+ship)}</td><td class="hide">${w(fe)}</td><td class="hide-m">${w(pr)}</td><td class="p c-price"><span class="lb${l.startsWith('선물')?' g':''}">${esc(nm)} · ${l}</span>${w(s)}</td><td class="cmp c-cmp">${cmp(nm,l,s)}</td></tr>`}).join('');
-$('note').textContent=c>0&&c<9?`※ 박스 과수(${c}과)보다 큰 세트는 여러 박스를 섞어 구성해야 해요.`:'';}
+$('note').textContent=c>0&&c<9?`※ 박스 과수(${c}과)보다 큰 세트는 여러 박스를 섞어 구성해야 해요.`:'';if(typeof drawItems==='function')drawItems();}
 document.querySelectorAll('input').forEach(i=>i.addEventListener('input',calc));
 $('pre').addEventListener('change',e=>{if(e.target.value){const[p,c]=e.target.value.split(',');$('price').value=p;$('count').value=c;}calc();});
-document.querySelectorAll('.btns button').forEach(b=>b.onclick=()=>{$('fee').value=b.dataset.f;calc();});
+document.querySelectorAll('.btns button[data-f]').forEach(b=>b.onclick=()=>{$('fee').value=b.dataset.f;calc();});
 let CMP={};
+var BASE_ITEMS=null, ITEMS=[], EDIT_ID=null, ITEMS_READY=false;
 calc();
 fetch('data.json?t='+Date.now()).then(r=>r.json()).then(d=>{
  if(d.updated)$('upd').textContent='마지막 갱신: '+d.updated;
@@ -90,4 +133,47 @@ fetch('data.json?t='+Date.now()).then(r=>r.json()).then(d=>{
  if(d.defaults)for(const k in d.defaults)if($(k))$(k).value=d.defaults[k];
  if(d.market&&d.market.length){$('mk').style.display='';$('mkb').innerHTML=d.market.map(m=>`<tr><td>${esc(m.item)}</td><td>${m.url?`<a href="${esc(m.url)}" target="_blank" rel="noopener">${esc(m.source)}</a>`:esc(m.source)}</td><td>${esc(m.price)}</td></tr>`).join('');$('mkn').textContent=d.note||'';}
  calc();}).catch(()=>{});
+
+const ITM_KEY='fruit-items-v1';
+function nowKR(){const p=new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}).formatToParts(new Date());const g=ty=>p.find(x=>x.type===ty).value;return `${g('year')}-${g('month')}-${g('day')} ${g('hour')}:${g('minute')} (한국시간)`;}
+function packItems(arr,updated){return {schema:'fruit-items/1',updated:updated||nowKR(),items:arr};}
+function normItem(it){if(!it||typeof it!=='object')return null;const typ=it.type==='선물'?'선물':'실속';const id=String(it.id||'').trim();const name=String(it.name||'').trim();if(!id||!name)return null;return {id,name,country:String(it.country||'').trim(),variety:String(it.variety||'').trim(),type:typ,kg:Number(it.kg)||0,count:Number(it.count)||0,cost:Number(it.cost)||0,price:Number(it.price)||0};}
+function normPack(d){if(!d||d.schema!=='fruit-items/1'||!Array.isArray(d.items))return null;const items=d.items.map(normItem).filter(Boolean);if(!items.length)return null;return packItems(items,d.updated||nowKR());}
+function loadLocal(){try{const n=normPack(JSON.parse(localStorage.getItem(ITM_KEY)));if(n){ITEMS=n.items;return true;}}catch(e){}return false;}
+function saveLocal(){localStorage.setItem(ITM_KEY,JSON.stringify(packItems(ITEMS)));}
+function boxOf(it){if(it.type==='실속')return v('bb');return (Number(it.count)||0)<=6?v('g6'):v('g9');}
+function itemQuote(it){const fr=Number(it.cost)||0,b=boxOf(it),ship=v('ship');const f=Math.min(Math.max(v('fee'),0),50)/100;let s=(fr+b+ship+v('m'))/(1-f);if($('rd').checked)s=Math.ceil(s/100)*100;const fe=s*f,pr=s-fe-fr-b-ship;return {sale:s,profit:pr};}
+function itmMsg(s,ok){const el=$('itm-msg');if(!el)return;el.textContent=s||'';el.style.color=ok===false?'#c0392b':'#2f6b3f';}
+function clearForm(){EDIT_ID=null;$('itm-form-title').textContent='품목 추가';$('itm-save').textContent='추가';['it-name','it-country','it-variety','it-kg','it-count','it-cost','it-price'].forEach(id=>$(id).value='');$('it-type').value='실속';}
+function fillForm(it){EDIT_ID=it.id;$('itm-form-title').textContent='품목 수정';$('itm-save').textContent='저장';$('it-name').value=it.name;$('it-country').value=it.country;$('it-variety').value=it.variety;$('it-type').value=it.type;$('it-kg').value=it.kg;$('it-count').value=it.count;$('it-cost').value=it.cost;$('it-price').value=it.price;$('itm-form').scrollIntoView({behavior:'smooth',block:'nearest'});}
+function drawItems(){const box=$('itm-list');if(!box||!ITEMS_READY)return;if(!ITEMS.length){box.innerHTML='<small>등록된 품목이 없어요.</small>';return;}
+box.innerHTML=ITEMS.map(it=>{const q=itemQuote(it);const gift=it.type==='선물'?' gift':'';
+return `<article class="icard${gift}" data-id="${esc(it.id)}"><h3>${esc(it.name)} · ${esc(it.type)}</h3>
+<div class="meta">${esc(it.country)} · ${esc(it.variety)} · ${it.kg}kg · ${it.count}과</div>
+<div class="pr">매입가 ${w(it.cost)} · 판매가 <b>${w(it.price)}</b></div>
+<div class="quote">계산 판매가 <b>${w(q.sale)}</b> / 남는 돈 ${w(q.profit)}</div>
+<div class="row btns">
+<button type="button" data-act="apply">계산값을 판매가로</button>
+<button type="button" data-act="edit">수정</button>
+<button type="button" data-act="del">삭제</button>
+</div></article>`;}).join('');}
+function uid(){return 'item-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,6);}
+function findItem(id){return ITEMS.find(x=>x.id===id);}
+function bindItems(){
+$('itm-list').addEventListener('click',e=>{const btn=e.target.closest('button[data-act]');if(!btn)return;const card=btn.closest('.icard');const it=findItem(card&&card.dataset.id);if(!it)return;
+if(btn.dataset.act==='edit'){fillForm(it);itmMsg('');}
+else if(btn.dataset.act==='del'){if(!confirm(`'${it.name}' ${it.country} ${it.variety} ${it.type} ${it.count}과를 삭제할까요?`))return;ITEMS=ITEMS.filter(x=>x.id!==it.id);if(EDIT_ID===it.id)clearForm();saveLocal();drawItems();itmMsg('품목을 삭제했어요.',true);}
+else if(btn.dataset.act==='apply'){const q=itemQuote(it);it.price=Math.round(q.sale);saveLocal();drawItems();itmMsg('계산한 판매가를 반영했어요.',true);}});
+$('itm-form').addEventListener('submit',e=>{e.preventDefault();const it=normItem({id:EDIT_ID||uid(),name:$('it-name').value,country:$('it-country').value,variety:$('it-variety').value,type:$('it-type').value,kg:$('it-kg').value,count:$('it-count').value,cost:$('it-cost').value,price:$('it-price').value});if(!it){itmMsg('필수 항목을 확인해 주세요.',false);return;}
+if(EDIT_ID){const i=ITEMS.findIndex(x=>x.id===EDIT_ID);if(i<0){itmMsg('수정할 품목을 찾지 못했어요.',false);return;}it.id=EDIT_ID;ITEMS[i]=it;itmMsg('품목을 저장했어요.',true);}
+else{ITEMS.push(it);itmMsg('품목을 추가했어요.',true);}
+saveLocal();clearForm();drawItems();});
+$('itm-cancel').onclick=()=>{clearForm();itmMsg('');};
+$('itm-reset').onclick=()=>{if(!confirm('이 브라우저에 저장한 품목 변경을 지우고 기본 품목으로 되돌릴까요?'))return;ITEMS=(BASE_ITEMS||[]).map(x=>({...x}));localStorage.removeItem(ITM_KEY);clearForm();drawItems();itmMsg('기본 품목으로 되돌렸어요.',true);};
+$('itm-export').onclick=()=>{const blob=new Blob([JSON.stringify(packItems(ITEMS),null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='items.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);itmMsg('JSON 파일을 내려받았어요.',true);};
+$('itm-import').onclick=()=>$('itm-file').click();
+$('itm-file').addEventListener('change',e=>{const f=e.target.files&&e.target.files[0];e.target.value='';if(!f)return;const rd=new FileReader();rd.onload=()=>{try{const n=normPack(JSON.parse(rd.result));if(!n){itmMsg('과일 품목 JSON 형식이 아니에요. schema가 fruit-items/1인지 확인해 주세요.',false);return;}ITEMS=n.items;saveLocal();clearForm();drawItems();itmMsg(`${ITEMS.length}개 품목을 가져왔어요.`,true);}catch(err){itmMsg('JSON을 읽지 못했어요.',false);}};rd.readAsText(f);});
+}
+fetch('items.json?t='+Date.now()).then(r=>r.json()).then(d=>{const n=normPack(d);BASE_ITEMS=n?n.items.map(x=>({...x})):[];if(!loadLocal())ITEMS=(BASE_ITEMS||[]).map(x=>({...x}));ITEMS_READY=true;bindItems();drawItems();}).catch(()=>{if(!loadLocal())ITEMS=[];ITEMS_READY=true;bindItems();drawItems();});
+
 </script></body></html>

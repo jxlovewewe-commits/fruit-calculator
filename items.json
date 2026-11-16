@@ -1,0 +1,116 @@
+{
+  "schema": "fruit-items/1",
+  "updated": "2026-11-16 21:05 (한국시간)",
+  "items": [
+    {
+      "id": "peru-kent-sil4",
+      "name": "애플망고",
+      "country": "페루",
+      "variety": "켄트",
+      "type": "실속",
+      "kg": 1.83,
+      "count": 4,
+      "cost": 26000,
+      "price": 35500
+    },
+    {
+      "id": "peru-kent-sil6",
+      "name": "애플망고",
+      "country": "페루",
+      "variety": "켄트",
+      "type": "실속",
+      "kg": 2.75,
+      "count": 6,
+      "cost": 39000,
+      "price": 48500
+    },
+    {
+      "id": "peru-kent-sil8",
+      "name": "애플망고",
+      "country": "페루",
+      "variety": "켄트",
+      "type": "실속",
+      "kg": 3.67,
+      "count": 8,
+      "cost": 52000,
+      "price": 61500
+    },
+    {
+      "id": "peru-kent-gift6",
+      "name": "애플망고",
+      "country": "페루",
+      "variety": "켄트",
+      "type": "선물",
+      "kg": 2.75,
+      "count": 6,
+      "cost": 39000,
+      "price": 54000
+    },
+    {
+      "id": "peru-kent-gift9",
+      "name": "애플망고",
+      "country": "페루",
+      "variety": "켄트",
+      "type": "선물",
+      "kg": 4.13,
+      "count": 9,
+      "cost": 58500,
+      "price": 76500
+    },
+    {
+      "id": "brazil-keitt-sil4",
+      "name": "애플망고",
+      "country": "브라질",
+      "variety": "케이트",
+      "type": "실속",
+      "kg": 2,
+      "count": 4,
+      "cost": 23000,
+      "price": 32500
+    },
+    {
+      "id": "brazil-keitt-sil6",
+      "name": "애플망고",
+      "country": "브라질",
+      "variety": "케이트",
+      "type": "실속",
+      "kg": 3,
+      "count": 6,
+      "cost": 34500,
+      "price": 44000
+    },
+    {
+      "id": "brazil-keitt-sil8",
+      "name": "애플망고",
+      "country": "브라질",
+      "variety": "케이트",
+      "type": "실속",
+      "kg": 4,
+      "count": 8,
+      "cost": 46000,
+      "price": 55500
+    },
+    {
+      "id": "brazil-keitt-gift6",
+      "name": "애플망고",
+      "country": "브라질",
+      "variety": "케이트",
+      "type": "선물",
+      "kg": 3,
+      "count": 6,
+      "cost": 34500,
+      "price": 49500
+    },
+    {
+      "id": "brazil-keitt-gift9",
+      "name": "애플망고",
+      "country": "브라질",
+      "variety": "케이트",
+      "type": "선물",
+      "kg": 4.5,
+      "count": 9,
+      "cost": 51750,
+      "price": 69900
+    }
+  ]
+}
