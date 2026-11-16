@@ -12,6 +12,9 @@ input,select{width:100%;box-sizing:border-box;font-size:17px;padding:10px;border
 .per{margin-top:12px;font-size:15px}.per b{font-size:20px;color:#2f6b3f}
 table{width:100%;border-collapse:collapse;font-size:15px}th,td{padding:10px 6px;border-bottom:1px solid #eee;text-align:right}
 th:first-child,td:first-child{text-align:left}th{color:#666;font-weight:600;font-size:13px}
+td.p .lb{display:block;font-size:12px;font-weight:600;color:#555}
+td.p .lb.g{color:#b0405a}
+td .nm{display:block;font-size:12px;color:#777}
 td.p{font-weight:700;color:#1d5c30;background:#fff6cf;font-size:17px}
 tr.gift td:first-child{color:#b0405a}
 .btns button{font-size:14px;padding:8px 10px;border:1px solid #ccc;background:#fafafa;border-radius:8px;margin:6px 6px 0 0}
@@ -42,8 +45,9 @@ const $=id=>document.getElementById(id),v=id=>parseFloat($(id).value)||0,w=n=>Ma
 function calc(){const c=v('count'),per=c>0?v('price')/c:0;$('per').textContent=w(per);
 const f=Math.min(Math.max(v('fee'),0),50)/100,ship=v('ship');
 const sets=[['실속 4과',4,v('bb')],['실속 6과',6,v('bb')],['실속 8과',8,v('bb')],['선물 6과',6,v('g6')],['선물 9과',9,v('g9')]];
+const sel=$('pre'),nm=sel.value?sel.options[sel.selectedIndex].text.replace(/\s*\(.*$/,''):'직접 입력';
 $('tb').innerHTML=sets.map(([l,n,b])=>{const fr=per*n;let s=(fr+b+ship+v('m'))/(1-f);if($('rd').checked)s=Math.ceil(s/100)*100;const fe=s*f,pr=s-fe-fr-b-ship;
-return `<tr class="${l.startsWith('선물')?'gift':''}"><td>${l}</td><td class="hide">${w(fr)}</td><td class="hide">${w(b+ship)}</td><td class="hide">${w(fe)}</td><td>${w(pr)}</td><td class="p">${w(s)}</td></tr>`}).join('');
+return `<tr class="${l.startsWith('선물')?'gift':''}"><td><b>${l}</b><span class="nm">${nm}</span></td><td class="hide">${w(fr)}</td><td class="hide">${w(b+ship)}</td><td class="hide">${w(fe)}</td><td>${w(pr)}</td><td class="p"><span class="lb${l.startsWith('선물')?' g':''}">${nm} · ${l}</span>${w(s)}</td></tr>`}).join('');
 $('note').textContent=c>0&&c<9?`※ 박스 과수(${c}과)보다 큰 세트는 여러 박스를 섞어 구성해야 해요.`:'';}
 document.querySelectorAll('input').forEach(i=>i.addEventListener('input',calc));
 $('pre').addEventListener('change',e=>{if(e.target.value){const[p,c]=e.target.value.split(',');$('price').value=p;$('count').value=c;}calc();});
