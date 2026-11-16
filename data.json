@@ -1,0 +1,18 @@
+{
+  "updated": "2026-11-16 20:40 (한국시간)",
+  "note": "중간값은 여러 판매처 표본의 가운데 값이에요. 무료배송 기준.",
+  "presets": [
+    {"name": "페루 켄트 5.5kg", "price": 78000, "count": 12},
+    {"name": "브라질 케이트 4kg", "price": 46000, "count": 8},
+    {"name": "태국 망고", "price": 55000, "count": 14}
+  ],
+  "market": [
+    {"item": "브라질 실속 6과급", "source": "컬리 5~6입 2.1kg", "price": "44,000원 (중간 36,950원)", "url": "https://www.kurly.com/goods/1001802978"},
+    {"item": "브라질 선물 6과", "source": "동원몰 어반망고 2.6kg", "price": "56,900원 (중간 56,900원)", "url": "https://www.dongwonmall.com/product/detail.do?productId=003739142"},
+    {"item": "브라질 실속 9과급", "source": "컬리 9~10입 3.8kg", "price": "64,900원 (중간 62,400원)", "url": "https://www.kurly.com/goods/1001540428"},
+    {"item": "브라질 선물 9과", "source": "현대Hmall 보자기 3.6kg", "price": "77,900원 (중간 77,900원)", "url": "https://www.hmall.com/md/pda/itemPtc?slitmCd=2239101715"},
+    {"item": "페루 실속 6과급", "source": "컬리 5~6입 2.2kg", "price": "48,000원 (중간 39,450원)", "url": "https://www.kurly.com/goods/1001802972"},
+    {"item": "페루 선물 6과", "source": "웰굿 보자기 2.4kg", "price": "62,220원", "url": "https://m.shinsegaetvshopping.com/display/detail/85335203"},
+    {"item": "페루 실속 9과급", "source": "컬리 9~10입 3.8kg", "price": "67,700원 (중간 59,900원)", "url": "https://www.kurly.com/goods/1001802977"}
+  ]
+}
