@@ -44,8 +44,9 @@ small{color:#777}
 <small>판매가 = (과일 원가 + 박스 + 택배 + 남길 돈) ÷ (1 − 수수료율)</small>
 </div><script>
 const $=id=>document.getElementById(id),v=id=>parseFloat($(id).value)||0,w=n=>Math.round(n).toLocaleString('ko-KR')+'원';
-function cmp(nm,l,s){const m=(CMP[nm]||{})[l];if(!m||!m.price)return '<span class="df na">시세 정보 없음</span>';const g=Math.round(s-m.price);const b=m.basis?` (${m.basis} ${Number(m.price).toLocaleString('ko-KR')}원)`:'';
-if(g===0)return `<span class="df">시세와 같음${b}</span>`;return g<0?`<span class="df dn">▼ 시세보다 ${Math.abs(g).toLocaleString('ko-KR')}원 저렴${b}</span>`:`<span class="df up">▲ 시세보다 ${g.toLocaleString('ko-KR')}원 비쌈${b}</span>`;}
+function one(m,s,tag){if(!m||!m.price)return '';const g=Math.round(s-m.price);const b=` (${m.basis} ${Number(m.price).toLocaleString('ko-KR')}원)`;
+if(g===0)return `<span class="df">${tag}시세와 같음${b}</span>`;return g<0?`<span class="df dn">▼ ${tag}시세보다 ${Math.abs(g).toLocaleString('ko-KR')}원 저렴${b}</span>`:`<span class="df up">▲ ${tag}시세보다 ${g.toLocaleString('ko-KR')}원 비쌈${b}</span>`;}
+function cmp(nm,l,s){const m=(CMP[nm]||{})[l];const r=(m?one(m,s,'')+one(m.coupang,s,'쿠팡 '):'');return r||'<span class="df na">시세 정보 없음</span>';}
 function calc(){const c=v('count'),per=c>0?v('price')/c:0;$('per').textContent=w(per);
 const f=Math.min(Math.max(v('fee'),0),50)/100,ship=v('ship');
 const sets=[['실속 4과',4,v('bb')],['실속 6과',6,v('bb')],['실속 8과',8,v('bb')],['선물 6과',6,v('g6')],['선물 9과',9,v('g9')]];
