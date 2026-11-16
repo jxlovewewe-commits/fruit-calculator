@@ -13,6 +13,7 @@ input,select{width:100%;box-sizing:border-box;font-size:17px;padding:10px;border
 table{width:100%;border-collapse:collapse;font-size:15px}th,td{padding:10px 6px;border-bottom:1px solid #eee;text-align:right}
 th:first-child,td:first-child{text-align:left}th{color:#666;font-weight:600;font-size:13px}
 td.p .lb{display:block;font-size:12px;font-weight:600;color:#555}
+td.p .df{display:block;font-size:12px;font-weight:600}td.p .df.dn{color:#1a7f37}td.p .df.up{color:#c0392b}td.p .df.na{color:#999;font-weight:400}
 td.p .lb.g{color:#b0405a}
 td .nm{display:block;font-size:12px;color:#777}
 td.p{font-weight:700;color:#1d5c30;background:#fff6cf;font-size:17px}
@@ -39,24 +40,29 @@ small{color:#777}
 <div class="btns"><button data-f="0">수수료 0%</button><button data-f="3.5">스마트스토어 약 3.5%</button><button data-f="4.63">최대 약 4.6%</button></div>
 <label style="margin-top:10px"><input id="rd" type="checkbox" checked style="width:auto"> 100원 단위 올림</label></div>
 <div class="card" id="mk" style="display:none"><h2>4. 온라인 시세 (자동 갱신)</h2><table><thead><tr><th>상품</th><th>판매처</th><th>가격</th></tr></thead><tbody id="mkb"></tbody></table><small id="mkn"></small></div>
+<small>등락 표시는 자동 갱신된 시중 시세(같은 품목·과수 기준)와 비교한 값이에요.</small><br>
 <small>판매가 = (과일 원가 + 박스 + 택배 + 남길 돈) ÷ (1 − 수수료율)</small>
 </div><script>
 const $=id=>document.getElementById(id),v=id=>parseFloat($(id).value)||0,w=n=>Math.round(n).toLocaleString('ko-KR')+'원';
+function cmp(nm,l,s){const m=(CMP[nm]||{})[l];if(!m||!m.price)return '<span class="df na">시세 정보 없음</span>';const g=Math.round(s-m.price);const b=m.basis?` (${m.basis} ${Number(m.price).toLocaleString('ko-KR')}원)`:'';
+if(g===0)return `<span class="df">시세와 같음${b}</span>`;return g<0?`<span class="df dn">▼ 시세보다 ${Math.abs(g).toLocaleString('ko-KR')}원 저렴${b}</span>`:`<span class="df up">▲ 시세보다 ${g.toLocaleString('ko-KR')}원 비쌈${b}</span>`;}
 function calc(){const c=v('count'),per=c>0?v('price')/c:0;$('per').textContent=w(per);
 const f=Math.min(Math.max(v('fee'),0),50)/100,ship=v('ship');
 const sets=[['실속 4과',4,v('bb')],['실속 6과',6,v('bb')],['실속 8과',8,v('bb')],['선물 6과',6,v('g6')],['선물 9과',9,v('g9')]];
 const sel=$('pre'),nm=sel.value?sel.options[sel.selectedIndex].text.replace(/\s*\(.*$/,''):'직접 입력';
 $('tb').innerHTML=sets.map(([l,n,b])=>{const fr=per*n;let s=(fr+b+ship+v('m'))/(1-f);if($('rd').checked)s=Math.ceil(s/100)*100;const fe=s*f,pr=s-fe-fr-b-ship;
-return `<tr class="${l.startsWith('선물')?'gift':''}"><td><b>${l}</b><span class="nm">${nm}</span></td><td class="hide">${w(fr)}</td><td class="hide">${w(b+ship)}</td><td class="hide">${w(fe)}</td><td>${w(pr)}</td><td class="p"><span class="lb${l.startsWith('선물')?' g':''}">${nm} · ${l}</span>${w(s)}</td></tr>`}).join('');
+return `<tr class="${l.startsWith('선물')?'gift':''}"><td><b>${l}</b><span class="nm">${nm}</span></td><td class="hide">${w(fr)}</td><td class="hide">${w(b+ship)}</td><td class="hide">${w(fe)}</td><td>${w(pr)}</td><td class="p"><span class="lb${l.startsWith('선물')?' g':''}">${nm} · ${l}</span>${w(s)}${cmp(nm,l,s)}</td></tr>`}).join('');
 $('note').textContent=c>0&&c<9?`※ 박스 과수(${c}과)보다 큰 세트는 여러 박스를 섞어 구성해야 해요.`:'';}
 document.querySelectorAll('input').forEach(i=>i.addEventListener('input',calc));
 $('pre').addEventListener('change',e=>{if(e.target.value){const[p,c]=e.target.value.split(',');$('price').value=p;$('count').value=c;}calc();});
 document.querySelectorAll('.btns button').forEach(b=>b.onclick=()=>{$('fee').value=b.dataset.f;calc();});
+let CMP={};
 calc();
 const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 fetch('data.json?t='+Date.now()).then(r=>r.json()).then(d=>{
  if(d.updated)$('upd').textContent='마지막 갱신: '+d.updated;
  if(d.presets&&d.presets.length){$('pre').innerHTML=d.presets.map(p=>`<option value="${p.price},${p.count}">${esc(p.name)} (${p.count}과 ${Number(p.price).toLocaleString('ko-KR')}원)</option>`).join('')+'<option value="">직접 입력</option>';const[p,c]=$('pre').value.split(',');$('price').value=p;$('count').value=c;}
+ if(d.compare)CMP=d.compare;
  if(d.defaults)for(const k in d.defaults)if($(k))$(k).value=d.defaults[k];
  if(d.market&&d.market.length){$('mk').style.display='';$('mkb').innerHTML=d.market.map(m=>`<tr><td>${esc(m.item)}</td><td>${m.url?`<a href="${esc(m.url)}" target="_blank" rel="noopener">${esc(m.source)}</a>`:esc(m.source)}</td><td>${esc(m.price)}</td></tr>`).join('');$('mkn').textContent=d.note||'';}
  calc();}).catch(()=>{});
