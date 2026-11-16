@@ -10,17 +10,37 @@ h2{font-size:16px;margin:0 0 12px}
 label{font-size:13px;color:#555;display:block}
 input,select{width:100%;box-sizing:border-box;font-size:17px;padding:10px;border:1px solid #ccc;border-radius:8px;margin-top:4px}
 .per{margin-top:12px;font-size:15px}.per b{font-size:20px;color:#2f6b3f}
-table{width:100%;border-collapse:collapse;font-size:15px}th,td{padding:10px 6px;border-bottom:1px solid #eee;text-align:right}
+.tblw{width:100%;overflow-x:hidden}
+table{width:100%;border-collapse:collapse;font-size:15px;table-layout:fixed}
+th,td{padding:10px 6px;border-bottom:1px solid #eee;text-align:right;vertical-align:top}
 th:first-child,td:first-child{text-align:left}th{color:#666;font-weight:600;font-size:13px}
 td.p .lb{display:block;font-size:12px;font-weight:600;color:#555}
-td.p .df{display:block;font-size:12px;font-weight:600}td.p .df.dn{color:#1a7f37}td.p .df.up{color:#c0392b}td.p .df.na{color:#999;font-weight:400}
 td.p .lb.g{color:#b0405a}
 td .nm{display:block;font-size:12px;color:#777}
+td .profit-m{display:none;font-size:11px;color:#777;font-weight:400}
 td.p{font-weight:700;color:#1d5c30;background:#fff6cf;font-size:17px}
+td.cmp{font-size:12px;font-weight:400;text-align:left;line-height:1.4;color:#333;background:#fff;word-break:keep-all;overflow-wrap:anywhere}
+td.cmp .df{display:block;font-size:12px;font-weight:600;margin:0 0 5px}
+td.cmp .df.dn{color:#1a7f37}td.cmp .df.up{color:#c0392b}td.cmp .df.na{color:#999;font-weight:400}
+td.cmp .src{display:block;font-weight:400;margin-top:1px}
+td.cmp a{color:inherit;text-decoration:underline;text-underline-offset:2px}
 tr.gift td:first-child{color:#b0405a}
 .btns button{font-size:14px;padding:8px 10px;border:1px solid #ccc;background:#fafafa;border-radius:8px;margin:6px 6px 0 0}
 small{color:#777}
-@media(max-width:520px){.hide{display:none}}
+@media(max-width:520px){
+.hide,.hide-m{display:none!important}
+.w{padding:12px;overflow-x:hidden}
+.card{padding:12px;overflow:hidden}
+table{font-size:14px}
+th,td{padding:8px 4px}
+.c-set{width:27%}
+.c-price{width:30%}
+.c-cmp{width:43%}
+td.p{font-size:16px}
+td.p .lb{font-size:11px}
+td.cmp,td.cmp .df{font-size:11px}
+.profit-m{display:block!important}
+}
 </style></head><body><div class="w">
 <h1>🥭 과일 세트 판매가 계산기</h1><p class="s">박스 매입가와 과수만 넣으면 세트별 판매가가 바로 나와요.<br><span id="upd" style="color:#2f6b3f"></span></p>
 <div class="card"><h2>1. 매입 정보</h2>
@@ -28,7 +48,7 @@ small{color:#777}
 <div class="g" style="margin-top:10px"><label>박스 매입가 (원)<input id="price" type="number" inputmode="numeric" value="78000"></label>
 <label>박스 과수 (개)<input id="count" type="number" inputmode="numeric" value="12"></label></div>
 <div class="per">과일 1개 원가: <b id="per"></b></div></div>
-<div class="card"><h2>2. 판매가</h2><table><thead><tr><th>세트</th><th class="hide">과일 원가</th><th class="hide">박스+택배</th><th class="hide">수수료</th><th>남는 돈</th><th>판매가</th></tr></thead><tbody id="tb"></tbody></table>
+<div class="card"><h2>2. 판매가</h2><div class="tblw"><table><thead><tr><th class="c-set">세트</th><th class="hide">과일 원가</th><th class="hide">박스+택배</th><th class="hide">수수료</th><th class="hide-m">남는 돈</th><th class="c-price">판매가</th><th class="c-cmp">비교</th></tr></thead><tbody id="tb"></tbody></table></div>
 <small id="note"></small></div>
 <div class="card"><h2>3. 비용 설정</h2><div class="g">
 <label>택배비<input id="ship" type="number" value="3000"></label>
@@ -40,26 +60,29 @@ small{color:#777}
 <div class="btns"><button data-f="0">수수료 0%</button><button data-f="3.5">스마트스토어 약 3.5%</button><button data-f="4.63">최대 약 4.6%</button></div>
 <label style="margin-top:10px"><input id="rd" type="checkbox" checked style="width:auto"> 100원 단위 올림</label></div>
 <div class="card" id="mk" style="display:none"><h2>4. 온라인 시세 (자동 갱신)</h2><table><thead><tr><th>상품</th><th>판매처</th><th>가격</th></tr></thead><tbody id="mkb"></tbody></table><small id="mkn"></small></div>
-<small>등락 표시는 자동 갱신된 시중 시세(같은 품목·과수 기준)와 비교한 값이에요.</small><br>
+<small>등락 표시는 자동 갱신된 시중 시세(같은 품목·과수·유형 기준)와 비교한 값이에요. 비교 칸의 판매처·가격을 누르면 해당 페이지로 이동해요.</small><br>
 <small>판매가 = (과일 원가 + 박스 + 택배 + 남길 돈) ÷ (1 − 수수료율)</small>
 </div><script>
 const $=id=>document.getElementById(id),v=id=>parseFloat($(id).value)||0,w=n=>Math.round(n).toLocaleString('ko-KR')+'원';
-function one(m,s,tag){if(!m||!m.price)return '';const g=Math.round(s-m.price);const b=` (${m.basis} ${Number(m.price).toLocaleString('ko-KR')}원)`;
-if(g===0)return `<span class="df">${tag}시세와 같음${b}</span>`;return g<0?`<span class="df dn">▼ ${tag}시세보다 ${Math.abs(g).toLocaleString('ko-KR')}원 저렴${b}</span>`:`<span class="df up">▲ ${tag}시세보다 ${g.toLocaleString('ko-KR')}원 비쌈${b}</span>`;}
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function alink(url,text){const t=esc(text);return url?`<a href="${esc(url)}" target="_blank" rel="noopener">${t}</a>`:t;}
+function one(m,s,tag){if(!m||!m.price)return '';const g=Math.round(s-m.price);
+const src=`<span class="src">(${alink(m.url,m.basis)} ${alink(m.url,Number(m.price).toLocaleString('ko-KR')+'원')})</span>`;
+if(g===0)return `<span class="df">${tag}시세와 같음${src}</span>`;
+return g<0?`<span class="df dn">▼ ${tag}시세보다 ${Math.abs(g).toLocaleString('ko-KR')}원 저렴${src}</span>`:`<span class="df up">▲ ${tag}시세보다 ${g.toLocaleString('ko-KR')}원 비쌈${src}</span>`;}
 function cmp(nm,l,s){const m=(CMP[nm]||{})[l];const r=(m?one(m,s,'')+one(m.coupang,s,'쿠팡 '):'');return r||'<span class="df na">시세 정보 없음</span>';}
 function calc(){const c=v('count'),per=c>0?v('price')/c:0;$('per').textContent=w(per);
 const f=Math.min(Math.max(v('fee'),0),50)/100,ship=v('ship');
 const sets=[['실속 4과',4,v('bb')],['실속 6과',6,v('bb')],['실속 8과',8,v('bb')],['선물 6과',6,v('g6')],['선물 9과',9,v('g9')]];
 const sel=$('pre'),nm=sel.value?sel.options[sel.selectedIndex].text.replace(/\s*\(.*$/,''):'직접 입력';
 $('tb').innerHTML=sets.map(([l,n,b])=>{const fr=per*n;let s=(fr+b+ship+v('m'))/(1-f);if($('rd').checked)s=Math.ceil(s/100)*100;const fe=s*f,pr=s-fe-fr-b-ship;
-return `<tr class="${l.startsWith('선물')?'gift':''}"><td><b>${l}</b><span class="nm">${nm}</span></td><td class="hide">${w(fr)}</td><td class="hide">${w(b+ship)}</td><td class="hide">${w(fe)}</td><td>${w(pr)}</td><td class="p"><span class="lb${l.startsWith('선물')?' g':''}">${nm} · ${l}</span>${w(s)}${cmp(nm,l,s)}</td></tr>`}).join('');
+return `<tr class="${l.startsWith('선물')?'gift':''}"><td class="c-set"><b>${l}</b><span class="nm">${esc(nm)}</span><span class="profit-m">남는 돈 ${w(pr)}</span></td><td class="hide">${w(fr)}</td><td class="hide">${w(b+ship)}</td><td class="hide">${w(fe)}</td><td class="hide-m">${w(pr)}</td><td class="p c-price"><span class="lb${l.startsWith('선물')?' g':''}">${esc(nm)} · ${l}</span>${w(s)}</td><td class="cmp c-cmp">${cmp(nm,l,s)}</td></tr>`}).join('');
 $('note').textContent=c>0&&c<9?`※ 박스 과수(${c}과)보다 큰 세트는 여러 박스를 섞어 구성해야 해요.`:'';}
 document.querySelectorAll('input').forEach(i=>i.addEventListener('input',calc));
 $('pre').addEventListener('change',e=>{if(e.target.value){const[p,c]=e.target.value.split(',');$('price').value=p;$('count').value=c;}calc();});
 document.querySelectorAll('.btns button').forEach(b=>b.onclick=()=>{$('fee').value=b.dataset.f;calc();});
 let CMP={};
 calc();
-const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 fetch('data.json?t='+Date.now()).then(r=>r.json()).then(d=>{
  if(d.updated)$('upd').textContent='마지막 갱신: '+d.updated;
  if(d.presets&&d.presets.length){$('pre').innerHTML=d.presets.map(p=>`<option value="${p.price},${p.count}">${esc(p.name)} (${p.count}과 ${Number(p.price).toLocaleString('ko-KR')}원)</option>`).join('')+'<option value="">직접 입력</option>';const[p,c]=$('pre').value.split(',');$('price').value=p;$('count').value=c;}

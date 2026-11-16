@@ -1,6 +1,6 @@
 {
-  "updated": "2026-11-16 20:45 (한국시간)",
-  "note": "쿠팡 가격은 쿠팡 페이지가 막혀 가격추적 사이트(로우차트) 11/16 현재가를 썼어요. 중간값은 여러 판매처 표본의 가운데 값, 무료배송 기준.",
+  "updated": "2026-11-16 20:51 (한국시간)",
+  "note": "쿠팡 가격은 쿠팡 페이지가 막혀 가격추적 사이트(로우차트·랭킹박스) 11/16 현재가를 썼어요. 선물 세트는 선물용 상품, 실속 세트는 실속·가정용 상품과만 비교해요. 중간값은 여러 판매처 표본의 가운데 값, 무료배송 기준.",
   "presets": [
     {
       "name": "페루 켄트 5.5kg",
@@ -21,9 +21,9 @@
   "market": [
     {
       "item": "브라질 실속 4과",
-      "source": "쿠팡 더로얄 4입 1.7kg (로우차트 11/16)",
-      "price": "38,900원",
-      "url": "https://www.lowchart.com/7487603897-19573089763"
+      "source": "쿠팡 더로얄 2입×2팩 1.72kg (로우차트 11/16)",
+      "price": "39,000원",
+      "url": "https://www.lowchart.com/6638614777-19282993229"
     },
     {
       "item": "브라질 실속 5과",
@@ -44,10 +44,22 @@
       "url": "https://www.kurly.com/goods/1001802978"
     },
     {
+      "item": "브라질 실속 8과급",
+      "source": "쿠팡 수플린 실속세트 8~9과 3.5kg (랭킹박스 11/16)",
+      "price": "62,900원",
+      "url": "https://rankingbox.kr/products/7339815517"
+    },
+    {
       "item": "브라질 선물 6과",
-      "source": "동원몰 어반망고 2.6kg",
+      "source": "동원몰 어반망고 선물세트 2.6kg",
       "price": "56,900원 (중간 56,900원)",
       "url": "https://www.dongwonmall.com/product/detail.do?productId=003739142"
+    },
+    {
+      "item": "브라질 선물 6과",
+      "source": "쿠팡 수플린 선물세트 6과 2.6kg (랭킹박스 11/16)",
+      "price": "50,900원",
+      "url": "https://rankingbox.kr/products/7339815551"
     },
     {
       "item": "브라질 실속 9과급",
@@ -85,46 +97,58 @@
       "실속 6과": {
         "price": 48000,
         "basis": "컬리 5~6입 2.2kg",
+        "url": "https://www.kurly.com/goods/1001802972",
         "coupang": {
           "price": 49800,
-          "basis": "쿠팡 수플린 6과 2.2kg, 로우차트",
+          "basis": "쿠팡 수플린 6과 2.2kg, 로우차트 11/16",
           "url": "https://www.lowchart.com/7870290009-21613152151"
         }
       },
       "선물 6과": {
         "price": 62220,
         "basis": "웰굿 보자기 6과",
-        "coupang": {
-          "price": 49800,
-          "basis": "쿠팡 수플린 6과 실속팩, 로우차트",
-          "url": "https://www.lowchart.com/7870290009-21613152151"
-        }
+        "url": "https://m.shinsegaetvshopping.com/display/detail/85335203"
       }
     },
     "브라질 케이트 4kg": {
       "실속 4과": {
         "coupang": {
-          "price": 38900,
-          "basis": "쿠팡 더로얄 4입 1.7kg, 로우차트",
-          "url": "https://www.lowchart.com/7487603897-19573089763"
+          "price": 39000,
+          "basis": "쿠팡 더로얄 2입×2팩 1.72kg, 로우차트 11/16",
+          "url": "https://www.lowchart.com/6638614777-19282993229"
         }
       },
       "실속 6과": {
         "price": 44000,
         "basis": "컬리 5~6입 2.1kg",
+        "url": "https://www.kurly.com/goods/1001802978",
         "coupang": {
           "price": 45310,
-          "basis": "쿠팡 더로얄 5과, 로우차트",
+          "basis": "쿠팡 더로얄 5과, 로우차트 11/16",
           "url": "https://www.lowchart.com/7749021321-20993663285"
+        }
+      },
+      "실속 8과": {
+        "coupang": {
+          "price": 62900,
+          "basis": "쿠팡 수플린 실속세트 8~9과 3.5kg, 랭킹박스 11/16",
+          "url": "https://rankingbox.kr/products/7339815517"
         }
       },
       "선물 6과": {
         "price": 56900,
-        "basis": "동원몰 6과"
+        "basis": "동원몰 6과 선물세트",
+        "url": "https://www.dongwonmall.com/product/detail.do?productId=003739142",
+        "coupang": {
+          "price": 50900,
+          "basis": "쿠팡 수플린 선물세트 6과 2.6kg, 랭킹박스 11/16",
+          "url": "https://rankingbox.kr/products/7339815551"
+        }
       },
       "선물 9과": {
         "price": 77900,
-        "basis": "현대Hmall 9과"
+        "basis": "현대Hmall 9과 보자기",
+        "url": "https://www.hmall.com/md/pda/itemPtc?slitmCd=2239101715"
       }
     }
   }
