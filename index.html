@@ -53,9 +53,44 @@ td.cmp,td.cmp .df{font-size:11px}
 #itm-form{margin-top:12px;padding-top:12px;border-top:1px solid #eee}
 #itm-form h3{font-size:14px;margin:0 0 8px}
 #itm-msg{display:block;margin-top:8px;font-size:13px;color:#2f6b3f}
+.tabs{display:flex;gap:8px;margin:0 0 14px}
+.tab{flex:1;font:inherit;font-size:15px;font-weight:700;padding:11px 8px;border:1px solid #d5ddd2;background:#fff;border-radius:10px;color:#444;cursor:pointer}
+.tab.on{background:#2f6b3f;color:#fff;border-color:#2f6b3f}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-size:14px;padding:8px 12px;border:1px solid #ccc;background:#fafafa;border-radius:999px;color:#333;cursor:pointer}
+.chip.on{background:#fff6cf;border-color:#e2c96a;color:#1d5c30;font-weight:700}
+.md{font-size:15px;line-height:1.6;word-break:keep-all;overflow-wrap:anywhere}
+.md h2{font-size:20px;line-height:1.4;margin:0 0 12px}
+.md h3{font-size:16px;margin:18px 0 8px}
+.md h4{font-size:15px;margin:14px 0 6px}
+.md p{margin:0 0 10px}
+.md ul,.md ol{margin:0 0 12px;padding-left:1.25em}
+.md li{margin:4px 0}
+.md a{color:#1d5c30;text-underline-offset:2px;overflow-wrap:anywhere}
+.md code{font-size:.92em;background:#f3f4f1;padding:1px 4px;border-radius:4px}
+.md .tw{width:100%;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 0 12px}
+.md table{width:100%;min-width:0;table-layout:auto;font-size:14px}
+.md th,.md td{text-align:left;padding:8px 6px;vertical-align:middle;word-break:keep-all}
+.md th{color:#666;font-size:12px;background:#f6f7f5}
+.md td.up{color:#c0392b;font-weight:700;white-space:nowrap}
+.md td.dn{color:#1a7f37;font-weight:700;white-space:nowrap}
+@media(max-width:520px){
+.md h2{font-size:18px}
+.md,.md table{font-size:14px}
+.md th,.md td{padding:8px 4px}
+.tab{padding:10px 6px}
+#view-report .card{overflow:visible}
+}
 
 </style></head><body><div class="w">
-<h1>🥭 과일 세트 판매가 계산기</h1><p class="s">박스 매입가와 과수만 넣으면 세트별 판매가가 바로 나와요.<br><span id="upd" style="color:#2f6b3f"></span></p>
+<h1>🥭 과일 세트 판매가 계산기</h1>
+<p class="s" id="lead-calc">박스 매입가와 과수만 넣으면 세트별 판매가가 바로 나와요.<br><span id="upd" style="color:#2f6b3f"></span></p>
+<p class="s" id="lead-report" hidden>매일 올라온 보고서를 날짜별로 볼 수 있어요.</p>
+<nav class="tabs" role="tablist" aria-label="화면">
+<button type="button" class="tab on" id="tab-calc" role="tab" aria-selected="true" aria-controls="view-calc">계산기</button>
+<button type="button" class="tab" id="tab-report" role="tab" aria-selected="false" aria-controls="view-report">일일 보고서</button>
+</nav>
+<div id="view-calc">
 <div class="card"><h2>1. 매입 정보</h2>
 <label>빠른 선택<select id="pre"><option value="78000,12">페루 켄트 5.5kg (12과 78,000원)</option><option value="46000,8">브라질 케이트 4kg (8과 46,000원)</option><option value="55000,14">태국 망고 (14과 55,000원)</option><option value="">직접 입력</option></select></label>
 <div class="g" style="margin-top:10px"><label>박스 매입가 (원)<input id="price" type="number" inputmode="numeric" value="78000"></label>
@@ -104,6 +139,14 @@ td.cmp,td.cmp .df{font-size:11px}
 </div>
 <small>등락 표시는 자동 갱신된 시중 시세(같은 품목·과수·유형 기준)와 비교한 값이에요. 비교 칸의 판매처·가격을 누르면 해당 페이지로 이동해요.</small><br>
 <small>판매가 = (과일 원가 + 박스 + 택배 + 남길 돈) ÷ (1 − 수수료율)</small>
+</div>
+<div id="view-report" hidden>
+<div class="card"><h2>날짜</h2>
+<div id="rep-dates" class="chips"></div>
+<div class="btns"><button type="button" id="rep-refresh">다시 불러오기</button></div>
+</div>
+<article class="card md" id="rep-article" aria-live="polite"><p class="s">보고서를 불러오는 중…</p></article>
+</div>
 </div><script>
 const $=id=>document.getElementById(id),v=id=>parseFloat($(id).value)||0,w=n=>Math.round(n).toLocaleString('ko-KR')+'원';
 const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -175,5 +218,117 @@ $('itm-import').onclick=()=>$('itm-file').click();
 $('itm-file').addEventListener('change',e=>{const f=e.target.files&&e.target.files[0];e.target.value='';if(!f)return;const rd=new FileReader();rd.onload=()=>{try{const n=normPack(JSON.parse(rd.result));if(!n){itmMsg('과일 품목 JSON 형식이 아니에요. schema가 fruit-items/1인지 확인해 주세요.',false);return;}ITEMS=n.items;saveLocal();clearForm();drawItems();itmMsg(`${ITEMS.length}개 품목을 가져왔어요.`,true);}catch(err){itmMsg('JSON을 읽지 못했어요.',false);}};rd.readAsText(f);});
 }
 fetch('items.json?t='+Date.now()).then(r=>r.json()).then(d=>{const n=normPack(d);BASE_ITEMS=n?n.items.map(x=>({...x})):[];if(!loadLocal())ITEMS=(BASE_ITEMS||[]).map(x=>({...x}));ITEMS_READY=true;bindItems();drawItems();}).catch(()=>{if(!loadLocal())ITEMS=[];ITEMS_READY=true;bindItems();drawItems();});
+
+let REP=[], REP_DATE='', repToken=0;
+function bust(url){return url+(url.includes('?')?'&':'?')+'t='+Date.now();}
+function mdInline(raw){
+  let s=esc(raw);
+  s=s.replace(/`([^`]+)`/g,'<code>$1</code>');
+  s=s.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
+  s=s.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,(m,t,u)=>`<a href="${u}" target="_blank" rel="noopener">${t}</a>`);
+  s=s.replace(/(^|[\s(])(https?:\/\/[^\s<)]+)/g,(m,pre,u)=>{
+    let url=u, extra='';
+    while(url && /[.,;:)]$/.test(url)){extra=url.slice(-1)+extra;url=url.slice(0,-1);}
+    if(!url)return m;
+    return `${pre}<a href="${url}" target="_blank" rel="noopener">${url}</a>${extra}`;
+  });
+  return s;
+}
+function splitCells(line){let s=line.trim();if(s.startsWith('|'))s=s.slice(1);if(s.endsWith('|'))s=s.slice(0,-1);return s.split('|').map(c=>c.trim());}
+function isSep(line){const cells=splitCells(line);return cells.length>1 && cells.every(c=>/^:?-{3,}:?$/.test(c));}
+function looksLikeRow(line){return line.trim().includes('|') && splitCells(line).length>1;}
+function mdCell(text,tag){const raw=text.trim();let cls='';if(/^\+\d/.test(raw))cls=' class="up"';else if(/^-\d/.test(raw))cls=' class="dn"';return `<${tag}${cls}>${mdInline(text)}</${tag}>`;}
+function renderMd(src){
+  const lines=String(src||'').replace(/\r\n/g,'\n').split('\n');
+  const out=[]; let i=0;
+  const isH=l=>/^#{1,3}\s+\S/.test(l), isUl=l=>/^\s*[-*]\s+\S/.test(l), isOl=l=>/^\s*\d+\.\s+\S/.test(l);
+  const isTable=i0=>looksLikeRow(lines[i0]) && i0+1<lines.length && isSep(lines[i0+1]);
+  while(i<lines.length){
+    const line=lines[i];
+    if(!line.trim()){i++;continue;}
+    const hm=/^(#{1,3})\s+(.+?)\s*$/.exec(line);
+    if(hm){const lv=hm[1].length, tag=lv===1?'h2':lv===2?'h3':'h4';out.push(`<${tag}>${mdInline(hm[2])}</${tag}>`);i++;continue;}
+    if(isTable(i)){
+      const head=splitCells(line); i+=2; const body=[];
+      while(i<lines.length && looksLikeRow(lines[i]) && !isSep(lines[i])){body.push(splitCells(lines[i]));i++;}
+      const hs=head.map(c=>mdCell(c,'th')).join('');
+      const bs=body.map(row=>'<tr>'+head.map((_,c)=>mdCell(row[c]||'','td')).join('')+'</tr>').join('');
+      out.push(`<div class="tw"><table><thead><tr>${hs}</tr></thead><tbody>${bs}</tbody></table></div>`);
+      continue;
+    }
+    if(isUl(line)){const items=[];while(i<lines.length && isUl(lines[i])){items.push(lines[i].replace(/^\s*[-*]\s+/,''));i++;}out.push('<ul>'+items.map(t=>`<li>${mdInline(t)}</li>`).join('')+'</ul>');continue;}
+    if(isOl(line)){const items=[];while(i<lines.length && isOl(lines[i])){items.push(lines[i].replace(/^\s*\d+\.\s+/,''));i++;}out.push('<ol>'+items.map(t=>`<li>${mdInline(t)}</li>`).join('')+'</ol>');continue;}
+    const para=[];
+    while(i<lines.length && lines[i].trim() && !isH(lines[i]) && !isUl(lines[i]) && !isOl(lines[i]) && !isTable(i)){para.push(lines[i].trim());i++;}
+    out.push('<p>'+para.map(mdInline).join('<br>')+'</p>');
+  }
+  return out.join('');
+}
+function chipLabel(date){
+  const p=date.split('-');
+  const wd=['일','월','화','수','목','금','토'][new Date(date+'T00:00:00Z').getUTCDay()];
+  return Number(p[1])+'/'+Number(p[2])+' ('+wd+')';
+}
+function setTabs(view){
+  const report=view==='report';
+  $('view-calc').hidden=report;
+  $('view-report').hidden=!report;
+  $('lead-calc').hidden=report;
+  $('lead-report').hidden=!report;
+  $('tab-calc').classList.toggle('on',!report);
+  $('tab-report').classList.toggle('on',report);
+  $('tab-calc').setAttribute('aria-selected',String(!report));
+  $('tab-report').setAttribute('aria-selected',String(report));
+}
+function currentRoute(){
+  let h='';
+  try{h=decodeURIComponent((location.hash||'').replace(/^#/,''));}catch(e){h='';}
+  if(h==='report'||h.indexOf('report/')===0){const date=h.slice(7);return {view:'report',date:/^\d{4}-\d{2}-\d{2}$/.test(date)?date:''};}
+  return {view:'calc',date:''};
+}
+function go(hash){
+  const next=location.pathname+location.search+(hash?'#'+hash:'');
+  if(location.pathname+location.search+location.hash!==next)history.pushState(null,'',next);
+  applyRoute();
+}
+function drawDates(active){
+  REP_DATE=active;
+  $('rep-dates').innerHTML=REP.map((r,i)=>{
+    const on=r.date===active, label=chipLabel(r.date)+(i===0?' · 최신':'');
+    return `<button type="button" class="chip${on?' on':''}" data-date="${esc(r.date)}" title="${esc(r.title||label)}" aria-pressed="${on}">${esc(label)}</button>`;
+  }).join('');
+}
+async function refreshReports(prefer){
+  const token=++repToken, box=$('rep-article');
+  box.innerHTML='<p class="s">보고서를 불러오는 중…</p>';
+  try{
+    const res=await fetch(bust('reports/index.json'),{cache:'no-store'});
+    if(!res.ok)throw new Error('index');
+    const data=await res.json();
+    if(token!==repToken)return;
+    const list=Array.isArray(data.reports)?data.reports:[];
+    REP=list.filter(x=>x&&/^\d{4}-\d{2}-\d{2}$/.test(String(x.date))).map(x=>({date:String(x.date),title:String(x.title||'').trim()}));
+    REP.sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:0);
+    if(!REP.length){REP_DATE='';$('rep-dates').innerHTML='';box.innerHTML='<p class="s">아직 올라온 보고서가 없어요.</p>';return;}
+    const date=(prefer&&REP.some(x=>x.date===prefer))?prefer:REP[0].date;
+    drawDates(date);
+    const md=await fetch(bust('reports/'+date+'.md'),{cache:'no-store'});
+    if(token!==repToken)return;
+    if(!md.ok){box.innerHTML='<p class="s">이 날짜의 보고서 파일을 찾지 못했어요.</p>';return;}
+    const html=renderMd(await md.text());
+    if(token!==repToken)return;
+    box.innerHTML=html||'<p class="s">이 보고서는 내용이 비어 있어요.</p>';
+  }catch(e){
+    if(token!==repToken)return;
+    box.innerHTML='<p class="s">보고서를 불러오지 못했어요. 잠시 후 다시 불러오기를 눌러 주세요.</p>';
+  }
+}
+function applyRoute(){const r=currentRoute();setTabs(r.view);if(r.view==='report')refreshReports(r.date);}
+$('tab-calc').onclick=()=>go('');
+$('tab-report').onclick=()=>go('report');
+$('rep-refresh').onclick=()=>refreshReports(REP_DATE||currentRoute().date);
+$('rep-dates').addEventListener('click',e=>{const b=e.target.closest('button[data-date]');if(b)go('report/'+b.dataset.date);});
+window.addEventListener('popstate',applyRoute);
+applyRoute();
 
 </script></body></html>
